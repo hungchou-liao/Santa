@@ -31,11 +31,11 @@ public class SantaController : MonoBehaviour
         // Flip Santa's sprite based on direction
         if (horizontal < 0)
         {
-            spriteRenderer.flipX = true; // Flip left
+            spriteRenderer.flipX = true; // Face left
         }
         else if (horizontal > 0)
         {
-            spriteRenderer.flipX = false; // Flip right
+            spriteRenderer.flipX = false; // Face right
         }
 
         // Jumping (only allowed once until landing)
@@ -48,13 +48,25 @@ public class SantaController : MonoBehaviour
         // Throw snowball on left mouse click, with cooldown
         if (Input.GetMouseButtonDown(0) && Time.time >= nextThrowTime)
         {
-            ThrowSnowball();
+            // Check the direction of the mouse position relative to Santa
+            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            if (mousePosition.x < transform.position.x)
+            {
+                spriteRenderer.flipX = true; // Face left
+            }
+            else
+            {
+                spriteRenderer.flipX = false; // Face right
+            }
+
+            // Throw the snowball
+            ThrowSnowball(mousePosition);
             nextThrowTime = Time.time + throwCooldown; // Set next allowable throw time
         }
     }
 
-    // Function to throw a snowball towards the mouse position
-    private void ThrowSnowball()
+    // Function to throw a snowball towards the specified target position
+    private void ThrowSnowball(Vector3 targetPosition)
     {
         // Determine spawn position based on the direction Santa is facing
         Vector3 spawnPosition = transform.position + (spriteRenderer.flipX ? Vector3.left : Vector3.right) * 0.5f;
@@ -62,9 +74,8 @@ public class SantaController : MonoBehaviour
         // Instantiate the snowball at the calculated position
         GameObject snowball = Instantiate(snowballPrefab, spawnPosition, Quaternion.identity);
 
-        // Calculate direction based on mouse position
-        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 direction = (mousePosition - transform.position).normalized;
+        // Calculate direction based on the target position (mouse position)
+        Vector2 direction = (targetPosition - transform.position).normalized;
 
         // Get the Rigidbody2D of the snowball and apply force in the calculated direction
         Rigidbody2D snowballRb = snowball.GetComponent<Rigidbody2D>();

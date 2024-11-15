@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class Snowball : MonoBehaviour
 {
+    public float lifetime = 3.0f; // Public variable for the snowball's lifetime
+
+    void Start()
+    {
+        // Destroy the snowball after the specified lifetime
+        Destroy(gameObject, lifetime);
+    }
+
     void Update()
     {
         // Destroy the snowball if it goes off-screen
