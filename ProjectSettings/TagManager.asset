@@ -7,6 +7,7 @@ TagManager:
   - Ground
   - Enemy
   - Present
+  - Snowball
   layers:
   - Default
   - TransparentFX
