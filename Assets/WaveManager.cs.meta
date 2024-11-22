@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b90dd917dfee1461e9ca6165abba7417
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - droneRobotPrefab: {fileID: 1349265432178842207, guid: ab3b29d83a177496fa63b5ab162bfe05, type: 3}
+  - groundRobotLeftPrefab: {fileID: 3153961856122623518, guid: 9766c36d3e0d34dd19d79e1f82c8e4c1, type: 3}
+  - groundRobotRightPrefab: {fileID: 7800889525606753033, guid: df9a92c86c36545a79d0a1ae578b2106, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

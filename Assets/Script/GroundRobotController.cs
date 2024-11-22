@@ -53,13 +53,7 @@ public class GroundRobotController : MonoBehaviour
                 MoveInEscapeDirection();
 
                 // Check if the robot has moved beyond the extended screen bounds
-                if (IsBeyondExtendedBounds(transform.position))
-                {
-                    Debug.Log("Present taken out of extended bounds!");
-                    Destroy(targetPresent); // Destroy only the present that the robot is carrying
-                    targetPresent = null;  // Clear the reference to avoid affecting other presents
-                    hasPresent = false;    // Reset the hasPresent flag
-                }
+                IsBeyondExtendedBounds(transform.position); // Robot will destroy itself here
             }
             else
             {
@@ -89,10 +83,17 @@ public class GroundRobotController : MonoBehaviour
     bool IsBeyondExtendedBounds(Vector3 position)
     {
         // Check if the position is outside the screen boundaries plus escapeDistance
-        return (position.x < screenLeft - escapeDistance ||
-                position.x > screenRight + escapeDistance ||
-                position.y < screenBottom - escapeDistance ||
-                position.y > screenTop + escapeDistance);
+        if (position.x < screenLeft - escapeDistance ||
+            position.x > screenRight + escapeDistance ||
+            position.y < screenBottom - escapeDistance ||
+            position.y > screenTop + escapeDistance)
+        {
+            // Destroy the robot once it's out of bounds
+            Destroy(gameObject);
+            Debug.Log("GroundRobot disappeared after moving out of bounds!");
+            return true;
+        }
+        return false;
     }
 
     void FindClosestPresent()
