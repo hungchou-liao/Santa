@@ -75,7 +75,8 @@ public class SantaController : MonoBehaviour
         GameObject snowball = Instantiate(snowballPrefab, spawnPosition, Quaternion.identity);
 
         // Calculate direction based on the target position (mouse position)
-        Vector2 direction = (targetPosition - transform.position).normalized;
+        Vector2 direction = targetPosition - transform.position;
+        direction = direction.normalized;
 
         // Get the Rigidbody2D of the snowball and apply force in the calculated direction
         Rigidbody2D snowballRb = snowball.GetComponent<Rigidbody2D>();
