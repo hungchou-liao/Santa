@@ -5,15 +5,16 @@ using UnityEngine;
 public class SantaController : MonoBehaviour
 {
     public float moveSpeed = 5f;         // Speed for horizontal movement
-    public float jumpForce = 10f;        // Force for jumping
-    public GameObject snowballPrefab;    // Reference to the Snowball Prefab
-    public float throwForce = 10f;       // Force to throw the snowball
-    public float throwCooldown = 0.5f;   // Cooldown time between snowball throws
+    public float jumpForce = 10f;       // Force for jumping
+    public GameObject snowballPrefab;   // Reference to the Snowball Prefab
+    public float throwForce = 10f;      // Force to throw the snowball
+    public float throwCooldown = 0.5f;  // Cooldown time between snowball throws
 
-    private Rigidbody2D rb;              // Reference to the Rigidbody2D component
+    private Rigidbody2D rb;             // Reference to the Rigidbody2D component
     private SpriteRenderer spriteRenderer; // Reference to the SpriteRenderer component
-    private bool canJump = true;         // Flag to control jumping
-    private float nextThrowTime = 0f;    // Time tracker for snowball cooldown
+    private bool canJump = true;        // Flag to control jumping
+    private float nextThrowTime = 0f;   // Time tracker for snowball cooldown
+    private bool isMagnetized = false;  // Whether Santa is being magnetized
 
     void Start()
     {
@@ -24,9 +25,15 @@ public class SantaController : MonoBehaviour
 
     void Update()
     {
+        // Skip input processing if Santa is magnetized
+        if (isMagnetized)
+        {
+            return;
+        }
+
         // Horizontal movement
         float horizontal = Input.GetAxis("Horizontal");
-        rb.velocity = new Vector2(horizontal * moveSpeed, rb.velocity.y);
+        rb.AddForce(new Vector2(horizontal * moveSpeed - rb.velocity.x, 0), ForceMode2D.Force);
 
         // Flip Santa's sprite based on direction
         if (horizontal < 0)
@@ -100,5 +107,16 @@ public class SantaController : MonoBehaviour
     private void OnCollisionExit2D(Collision2D collision)
     {
         canJump = false;
+    }
+
+    // Method to set Santa's magnetized state
+    public void SetMagnetized(bool state)
+    {
+        isMagnetized = state;
+
+        if (state)
+        {
+            rb.velocity = Vector2.zero; // Stop Santa's movement when magnetized
+        }
     }
 }
