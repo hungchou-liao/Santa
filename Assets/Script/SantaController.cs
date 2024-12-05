@@ -9,18 +9,27 @@ public class SantaController : MonoBehaviour
     public GameObject snowballPrefab;   // Reference to the Snowball Prefab
     public float throwForce = 10f;      // Force to throw the snowball
     public float throwCooldown = 0.5f;  // Cooldown time between snowball throws
+    public AudioClip throwSound;        // Sound effect for throwing the snowball
 
     private Rigidbody2D rb;             // Reference to the Rigidbody2D component
     private SpriteRenderer spriteRenderer; // Reference to the SpriteRenderer component
     private bool canJump = true;        // Flag to control jumping
     private float nextThrowTime = 0f;   // Time tracker for snowball cooldown
     private bool isMagnetized = false;  // Whether Santa is being magnetized
+    private AudioSource audioSource;    // Reference to the AudioSource component
 
     void Start()
     {
         // Get the Rigidbody2D and SpriteRenderer components
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        // Get or add an AudioSource component
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     void Update()
@@ -68,6 +77,10 @@ public class SantaController : MonoBehaviour
 
             // Throw the snowball
             ThrowSnowball(mousePosition);
+
+            // Play the throw sound effect
+            PlayThrowSound();
+
             nextThrowTime = Time.time + throwCooldown; // Set next allowable throw time
         }
     }
@@ -88,6 +101,15 @@ public class SantaController : MonoBehaviour
         // Get the Rigidbody2D of the snowball and apply force in the calculated direction
         Rigidbody2D snowballRb = snowball.GetComponent<Rigidbody2D>();
         snowballRb.AddForce(direction * throwForce, ForceMode2D.Impulse);
+    }
+
+    // Function to play the throw sound effect
+    private void PlayThrowSound()
+    {
+        if (throwSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(throwSound);
+        }
     }
 
     // Reset canJump when Santa is touching the ground
