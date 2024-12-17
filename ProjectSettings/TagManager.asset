@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - Present
   - Snowball
+  - Bucket
   layers:
   - Default
   - TransparentFX

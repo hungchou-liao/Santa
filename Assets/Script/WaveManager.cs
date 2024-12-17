@@ -4,77 +4,82 @@ using UnityEngine;
 
 public class WaveManager : MonoBehaviour
 {
+    [Header("Prefabs")]
     public GameObject droneRobotPrefab;             // Prefab for drones
-    public GameObject groundRobotLeftPrefab;        // Prefab for left-entering ground robots
-    public GameObject groundRobotRightPrefab;       // Prefab for right-entering ground robots
+    public GameObject groundRobotLeftPrefab;        // Prefab for ground robots (left)
+    public GameObject groundRobotRightPrefab;       // Prefab for ground robots (right)
 
-    public Transform[] leftSpawnPoints;             // Spawn points for left side
-    public Transform[] rightSpawnPoints;            // Spawn points for right side
+    [Header("Wave Settings")]
+    public int totalWaves = 3;                      // Total number of waves
+    public float[] waveStartDelays;                 // Array for delays before each wave starts
+    public float spawnDelay = 0.5f;                 // Delay between each enemy spawn
 
-    public float waveInterval = 30f;                // Time interval between waves
-    public int baseDroneCount = 2;                  // Base number of drones per wave
-    public int baseGroundCount = 2;                 // Base number of ground robots per wave
-    public float spawnDelay = 0.5f;                 // Delay between each robot spawn
+    [Header("Enemy Count Settings")]
+    public int droneCountPerWave = 5;               // Number of drones per wave
+    public int groundCountPerWave = 5;              // Total number of ground robots per wave
 
-    private int waveNumber = 0;                     // Tracks the current wave number
-
-    // Screen boundary limits for spawning
+    // Screen boundaries
     private float screenLeft = -16f;
     private float screenRight = 16f;
     private float screenTop = 12f;
+    private float screenBottom = -12f;
+
+    private int waveNumber = 0;                     // Tracks the current wave number
 
     void Start()
     {
-        // Start the wave spawning process
-        InvokeRepeating(nameof(SpawnWave), 0f, waveInterval);
+        // Start the wave spawning process with an initial delay
+        StartCoroutine(WaveController());
     }
 
-    void SpawnWave()
+    IEnumerator WaveController()
     {
-        waveNumber++;
-        Debug.Log("Wave " + waveNumber + " starting!");
+        while (waveNumber < totalWaves)
+        {
+            float currentWaveDelay = waveStartDelays[waveNumber];
+            Debug.Log("Wave " + (waveNumber + 1) + " starting in " + currentWaveDelay + " seconds!");
 
-        // Increase the robot count with each wave
-        int droneCount = baseDroneCount + waveNumber;
-        int groundCount = baseGroundCount + waveNumber;
+            yield return new WaitForSeconds(currentWaveDelay);
 
-        // Spawn drones above the screen limit
-        StartCoroutine(SpawnDrones(droneRobotPrefab, droneCount));
+            Debug.Log("Wave " + (waveNumber + 1) + " started!");
 
-        // Spawn ground robots alternately from left and right
-        StartCoroutine(SpawnGroundRobots(groundRobotLeftPrefab, leftSpawnPoints, groundCount / 2));
-        StartCoroutine(SpawnGroundRobots(groundRobotRightPrefab, rightSpawnPoints, groundCount / 2));
+            // Spawn enemies for this wave
+            StartCoroutine(SpawnDrones(droneCountPerWave));
+            StartCoroutine(SpawnGroundRobots(groundCountPerWave / 2, true));  // Left robots
+            StartCoroutine(SpawnGroundRobots(groundCountPerWave / 2, false)); // Right robots
+
+            waveNumber++;
+        }
+
+        Debug.Log("All waves completed!");
     }
 
-    System.Collections.IEnumerator SpawnDrones(GameObject dronePrefab, int count)
+    IEnumerator SpawnDrones(int count)
     {
         for (int i = 0; i < count; i++)
         {
-            // Generate a random x position within the screen limits
+            // Generate a random x position and spawn drones above the screen
             float randomX = Random.Range(screenLeft, screenRight);
+            Vector3 spawnPosition = new Vector3(randomX, screenTop + 2f, 0f);
 
-            // Spawn the drone above the top screen limit
-            Vector3 spawnPosition = new Vector3(randomX, screenTop + 2f, 0f); // Adjust spawn height as needed
-
-            // Instantiate the drone
-            Instantiate(dronePrefab, spawnPosition, Quaternion.identity);
-
-            // Wait for a short delay before spawning the next drone
+            Instantiate(droneRobotPrefab, spawnPosition, Quaternion.identity);
             yield return new WaitForSeconds(spawnDelay);
         }
     }
 
-    System.Collections.IEnumerator SpawnGroundRobots(GameObject robotPrefab, Transform[] spawnPoints, int count)
+    IEnumerator SpawnGroundRobots(int count, bool spawnLeft)
     {
         for (int i = 0; i < count; i++)
         {
-            // Pick a random spawn point from the given array
-            Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+            float spawnX = spawnLeft ? screenLeft - 2f : screenRight + 2f;  // Spawn left or right
+            float randomY = Random.Range(screenBottom, screenTop);
 
-            // Instantiate the robot at the chosen spawn point
-            Instantiate(robotPrefab, spawnPoint.position, spawnPoint.rotation);
+            Vector3 spawnPosition = new Vector3(spawnX, randomY, 0f);
 
-            // Wait for a short delay before spawning the next robot
+            // Choose the prefab based on spawn direction
+            GameObject prefab = spawnLeft ? groundRobotLeftPrefab : groundRobotRightPrefab;
+
+            Instantiate(prefab, spawnPosition, Quaternion.identity);
             yield return new WaitForSeconds(spawnDelay);
         }
     }

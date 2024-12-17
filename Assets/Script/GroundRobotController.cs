@@ -10,6 +10,7 @@ public class GroundRobotController : MonoBehaviour
     public float escapeDistance = 5f;               // Additional distance beyond screen boundary for escape
 
     public Image[] lifeImages;                      // Array of Image components for life indicators
+    public GameObject bucket;                       // Reference to the bucket GameObject
 
     private GameObject targetPresent = null;        // The specific present the robot is targeting
     private bool hasPresent = false;                // Flag to check if the robot is carrying a present
@@ -21,7 +22,6 @@ public class GroundRobotController : MonoBehaviour
     private float screenRight = 16f;
     private float screenTop = 12f;
     private float screenBottom = -12f;
-
     void Start()
     {
         // Get the SpriteRenderer component for flipping the robot

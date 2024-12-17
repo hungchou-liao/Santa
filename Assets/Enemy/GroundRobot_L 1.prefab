@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 6981701418568712481}
   - component: {fileID: 3753398609844297433}
   m_Layer: 0
-  m_Name: GroundRobot_L
+  m_Name: GroundRobot_L 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
