@@ -1,14 +1,14 @@
 using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
 
-public class GameOverReminder : MonoBehaviour
+public class GameoverReminder : MonoBehaviour
 {
     [Header("UI Animation Settings")]
-    public float enterDuration = 0.5f;  // Duration for fade-in
-    public float stayDuration = 2f;     // Duration to stay visible
-    public float exitDuration = 0.5f;   // Duration for fade-out
-    public AudioClip enterSound;        // Sound effect for entering
+    public float checkDelay = 65f;      // Delay before checking for presents
+    public float enterDuration = 0.5f; // Duration for fade-in
+    public float stayDuration = 5f;    // Duration to stay visible
+    public float exitDuration = 0.5f;  // Duration for fade-out
+    public AudioClip gameOverSound;    // Sound effect for game over
 
     private CanvasGroup canvasGroup;
     private AudioSource audioSource;
@@ -24,39 +24,37 @@ public class GameOverReminder : MonoBehaviour
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
 
-        // Start monitoring for presents
+        // Start the game over check coroutine
         StartCoroutine(CheckForGameOver());
     }
 
     IEnumerator CheckForGameOver()
     {
-        while (!gameOverTriggered)
-        {
-            // Check if no "Present" objects exist in the scene
-            GameObject[] presents = GameObject.FindGameObjectsWithTag("Present");
-            if (presents.Length == 0)
-            {
-                Debug.Log("Game Over: No presents remain!");
-                gameOverTriggered = true; // Prevent multiple triggers
-                StartCoroutine(ShowGameOver());
-            }
+        // Wait for the specified delay
+        yield return new WaitForSeconds(checkDelay);
 
-            yield return new WaitForSeconds(0.5f); // Check every 0.5 seconds
+        // Check if there are no "Present" objects in the scene
+        GameObject[] presents = GameObject.FindGameObjectsWithTag("Present");
+        if (presents.Length == 0 && !gameOverTriggered) // Trigger if no presents exist
+        {
+            Debug.Log("Game Over: No presents found!");
+            gameOverTriggered = true; // Prevent multiple triggers
+            StartCoroutine(ShowGameOverMessage());
         }
     }
 
-    IEnumerator ShowGameOver()
+    IEnumerator ShowGameOverMessage()
     {
-        // Play enter sound if provided
-        PlayEnterSound();
+        // Play game over sound if provided
+        PlayGameOverSound();
 
         // Fade in the Game Over message
         yield return Fade(0, 1, enterDuration);
 
-        // Stay visible
+        // Stay visible for the duration
         yield return new WaitForSeconds(stayDuration);
 
-        // Fade out
+        // Fade out the Game Over message
         yield return Fade(1, 0, exitDuration);
 
         // Optionally, deactivate the GameObject
@@ -75,11 +73,11 @@ public class GameOverReminder : MonoBehaviour
         canvasGroup.alpha = to;
     }
 
-    void PlayEnterSound()
+    void PlayGameOverSound()
     {
-        if (enterSound != null)
+        if (gameOverSound != null)
         {
-            audioSource.clip = enterSound;
+            audioSource.clip = gameOverSound;
             audioSource.Play();
         }
     }

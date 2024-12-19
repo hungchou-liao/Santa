@@ -4,8 +4,9 @@ using System.Collections;
 public class BoomController : MonoBehaviour
 {
     public float enterDelay = 1f;        // Delay before scaling and fade-in
-    public float scaleDuration = 0.5f;   // Duration for scaling from A to B
-    public float exitDuration = 2f;      // Duration for fade-out
+    public float scaleDuration = 0.5f;  // Duration for scaling from A to B
+    public float stayDuration = 2f;     // Duration for the image to stay visible
+    public float exitDuration = 2f;     // Duration for fade-out
     public Vector3 scaleStart = Vector3.one * 0.5f;  // Initial scale (A)
     public Vector3 scaleEnd = Vector3.one;           // Final scale (B)
     public AudioClip boomSound;          // Sound effect for scaling
@@ -40,6 +41,12 @@ public class BoomController : MonoBehaviour
 
         // Scale from A to B
         yield return ScaleOverTime(scaleStart, scaleEnd, scaleDuration);
+
+        // Ensure fully visible before staying
+        canvasGroup.alpha = 1f;
+
+        // Stay visible for the specified duration
+        yield return new WaitForSeconds(stayDuration);
 
         // Fade out
         yield return FadeOut(exitDuration);

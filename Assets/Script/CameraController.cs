@@ -17,16 +17,13 @@ public class CameraController : MonoBehaviour
     {
         originalPosition = transform.position;
 
-        // Start the first shake at the beginning
-        StartCoroutine(FirstShakeAndCheckScene());
+        // Remove the initial shake by starting the coroutine without it
+        StartCoroutine(CheckSceneAfterDelay());
     }
 
-    private IEnumerator FirstShakeAndCheckScene()
+    private IEnumerator CheckSceneAfterDelay()
     {
-        // First Shake at the beginning
-        yield return StartCoroutine(Shake());
-
-        // Wait for 65 seconds, then check the scene
+        // Wait for the specified delay before checking the scene
         yield return new WaitForSeconds(sceneCheckDelay);
 
         // Check if any objects tagged as "Present" are still in the scene
@@ -36,7 +33,7 @@ public class CameraController : MonoBehaviour
         {
             Debug.Log("Presents found! Shaking camera again and moving down.");
 
-            // Second shake before moving the camera
+            // Perform a shake before moving the camera
             yield return StartCoroutine(Shake());
 
             // Move the camera down
@@ -47,7 +44,6 @@ public class CameraController : MonoBehaviour
             Debug.Log("No presents found. Camera stays in position.");
         }
     }
-
     public IEnumerator Shake()
     {
         Debug.Log("Camera shake started.");
